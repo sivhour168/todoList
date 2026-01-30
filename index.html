@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    </head>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      body {
+        background-image: linear-gradient(
+          to right,
+          rgb(238, 0, 255),
+          rgb(189, 69, 175)
+        );
+        font-family:
+          "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+          "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+      }
+      .table {
+        margin: auto;
+        width: 50%;
+        height: auto;
+        background-color: rgb(238, 237, 237);
+        border: solid grey 1px;
+        border-radius: 30px;
+        box-shadow: 1px 1px 10px 1px;
+        input {
+          width: 20%;
+          height: 25px;
+          border: solid red;
+          border-radius: 10px;
+        }
+        .btnsave {
+          font-size: 16px;
+          font-weight: bold;
+          background-color: rgb(0, 170, 255);
+          border: none;
+          border-radius: 5px;
+          padding: 7px;
+          width: 100px;
+        }
+
+        ul {
+          list-style-type: none;
+          font-weight: bold;
+          font-size: 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          align-items: center;
+          li {
+            display: flex;
+            gap: 10px;
+
+            .btn1 {
+              font-size: 16px;
+              font-weight: bold;
+              background-color: red;
+              border: none;
+              border-radius: 5px;
+              padding: 7px;
+              width: 100px;
+            }
+            #btn2 {
+              font-size: 16px;
+              font-weight: bold;
+              background-color: rgb(0, 255, 0);
+              border: none;
+              border-radius: 5px;
+              padding: 7px;
+              width: 100px;
+            }
+
+            .btn3 {
+              width: 100px;
+              font-size: 16px;
+              font-weight: bold;
+              background-color: rgb(238, 255, 0);
+              border: none;
+              border-radius: 5px;
+              padding: 7px;
+            }
+          }
+        }
+      }
+    </style>
+  <body>
+    <div class="table">
+      <center>
+        <label><h4>Input Your task here</h4></label>
+        <input
+          type="text"
+          name=""
+          id="inputTask"
+          placeholder="Please Input Your Task"
+        />
+        <button class="btnsave" id="btnChange" onclick="newtask()">Save</button>
+        <!-- <button class="btnsave" id="btnEdite">Edite</button> -->
+      </center>
+
+      <hr color="red" />
+      <h1 align="center">🤯Task🤯</h1>
+      <ul id="ulTask"></ul>
+    </div>
+  </body>
+  <script>
+    const tasks = [];
+    const ulTask = document.getElementById("ulTask");
+    const inputTask = document.getElementById("inputTask");
+    const btnChange=document.getElementById("btnChange");
+    // const btn2=document.getElementById("btn2");
+    let status='add';
+    let mainIndex=-1;
+
+    // btnEdite.style.display="block";
+
+    // function fill
+    function randerTask() {
+      let taskString = "";
+      let btn2="Done";
+      for (let item of tasks) {
+        let taskName=`<strong>${item.id}.</strong>
+            <span>${item.task}</span>`;
+        if(item.isDone){
+           btn2="Undo";
+            taskName=`<del><strong>${item.id}.</strong>
+            <span>${item.task}</span></del>`;
+         }
+        
+        taskString += `
+         <li>
+            
+         ${taskName}
+            <button id="btn2" onclick="makeDone(${item.id})">${btn2}</button>
+            <button class="btn1" onclick="deleteTask(${item.id})">Delete</button> 
+            <button class="btn3"  onclick="Edite(${item.id})">Edit</button>
+        </li>
+        `;
+        btn2="Done";
+      }
+    //   console.log(taskString);
+      ulTask.innerHTML = taskString;
+      clear();
+    }
+
+    function newtask() {
+      const input = {
+        id: tasks.length + 1,
+        task: inputTask.value,
+        isDone: false,
+      };
+      
+      if(status=="add"){
+            tasks.push(input);
+      }else{
+        tasks[mainIndex].task=inputTask.value;
+      }
+      randerTask();
+    //   clear();
+    }
+    inputTask.addEventListener("keypress", function (e) {
+      if (e.key == "Enter") {
+        newtask().click;
+      }
+    });
+
+    function deleteTask(id) {
+      let index = -1;
+      for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id == id) {
+          index = i;
+        }
+      }
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire({
+      title: "Deleted!",
+      text: "Your file has been deleted.",
+      icon: "success"
+    });
+          // alert(index)
+          tasks.splice(index, 1);
+          randerTask();
+        }
+      });
+    }
+
+    function Edite (id){
+        let index = -1;
+        status="edite";
+      for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id == id) {
+          index = i;
+        }
+      }
+        btnChange.innerText = "Edit";
+        inputTask.value=tasks[index].task;
+         mainIndex=index;
+        inputTask.focus();
+
+    }
+
+     function makeDone (id){
+        let index = -1;
+        status="edite";
+      for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id == id) {
+          index = i;
+        }
+      }
+       tasks[index].isDone=true;
+       console.log(tasks);
+       randerTask();
+    }
+    //clear fill
+    function clear() {
+      inputTask.value = "";
+      inputTask.focus();
+      status="add";
+      btnChange.innerText="Save";
+      mainIndex=-1;
+    }
+  </script>
+</html>
